@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<style>
+  .slide {
+    height: 100vh;
+  }
+  .center {
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <div id="slides"></div>
+</body>
+
+
+<script src="/javascripts/slides.js"></script>
+<script>
+  $( document ).ready(function() {
+    // Create ordered slideshow 
+    const slideshow = createSlideShow(({{{fileContent}}}).slides);
+    
+    // Begin cycling the display of the slideshow
+    let currentSlide = 0;
+    const numSlides = slideshow.length;
+    
+    function updateDisplay() {
+     currentSlide = currentSlide % numSlides;
+     displaySlide(slideshow[currentSlide]);
+     adjustTimeout(slideshow[currentSlide]);
+    }
+    
+    function displaySlide(slide) {
+      // get rid of old content and show new content
+      $('#slides').empty();
+      $('#slides').append(slide.content);
+    }
+    
+    function adjustTimeout(slide) {
+      if(numSlides <= 1) {return;}
+      currentSlide++;
+      if(slide.type === 'video') {
+        let time = parseInt(slide.duration) * 1000;
+        setTimeout(updateDisplay, time); // make special video wipe to not reload every time?
+      } else {
+        setTimeout(updateDisplay, 3000);
+      }
+    }
+    updateDisplay();
+  });
+
+</script>
+</html>

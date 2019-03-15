@@ -1,0 +1,62 @@
+{
+  "slides": [
+    {
+      "type": "cover",
+      "order": 1,
+      "orientation": "portrait",
+      "content": {
+        "header-logo": "/images/header.png",
+        "footer-logo": "/images/footer.png",
+        "title": "title text",
+        "subtitle": "subtitle text",
+        "bgcolor": "60D9DC"
+      }
+    },
+    {
+      "type": "schedule",
+      "order": 2,
+      "orientation": "landscape",
+      "content": {
+        "slide-name": "name text",
+        "bgcolor": "hex value",
+        "logo": "img url",
+        "table": [
+          {
+            "start-time": "text",
+            "end-time": "text",
+            "session-type": "text",
+            "description": "text",
+            "speaker": "text"
+          }
+        ]
+      }
+    },
+    {
+      "type": "video",
+      "order": 3,
+      "orientation": "landscape",
+      "duration": "15",
+      "content": {
+        "title": "text",
+        "bgcolor": "hex value",
+        "link": "url",
+        "description": "text"
+      }
+    },
+    {
+      "type": "donors",
+      "order": 4,
+      "orientation": "landscape",
+      "content": {
+        "donors": [
+          {
+            "img": "url",
+            "name": "text",
+            "description": "text"
+          }
+        ],
+        "logo": "img url"
+      }
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <title>Simple login</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+
+  </head>
+  <body>
+    <h1>Create Slide</h1>
+
+    <form id="slideForm">
+      <div>
+        <a>Slide Name : </a>
+        <input type="TEXT" name="slidename" size="15"><br><br>
+        <a>Order Number : </a>
+        <input type="NUMBER" name="ordernum" size="2"><br><br>
+        <a>Background Color : </a>
+        <input type="COLOR" name="bgcolor" ><br><br>
+        <select id="numRows">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+        </select>
+        <button type="button" id="addRow">Add Row(s)</button>
+          <table id="myTable">
+              <tr>
+                  <th>Time</th>
+                  <th>Type of Session</th>
+                  <th>Description</th>
+                  <th>Speaker</th>
+                  
+              </tr>
+              <tr>
+                  <td><input type="TEXT" name="time" size="8"><br></td>
+                  <td>
+                      <select name="type">
+                          <option>Open Session</option>
+                          <option>Private Meeting</option>
+                          <option>No Session</option>
+                          <option>End of Day</option>
+
+                      </select><br>
+                  </td>
+                  <td><textarea name="description" rows="4" columns="25"></textarea></td>
+                  <td><input type="TEXT" name="speaker" size="20"><br></td>
+              </tr>
+              <br><br>
+
+          </table>
+          <br><br>
+
+          <input type="file" name="logo" />
+          <input type='submit' value='Submit' />
+
+      </div>
+    </form>
+    
+    <script>
+      $(document).ready(function(){
+        // Submit button action
+        let $form = $('#slideForm');
+        
+        $form.submit(function(event){
+          event.preventDefault();
+          $.ajax( {
+            url : "/upload",
+            type : "POST",
+            data : $form.serialize(),
+            fail : function(err){ console.log(err); },
+            success : function(result) { alert(result); },
+            done : function(result){ alert(result); }
+          } );
+        } );
+      });
+    </script>
+
+    
+  </body>
+</html>
