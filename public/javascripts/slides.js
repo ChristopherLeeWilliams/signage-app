@@ -43,19 +43,80 @@ function createCoverSlide(slide) {
 }
 
 function createScheduleSlide(slide) {
-    return $("<h2> Schedule Slide Not finished <h2>");
-}
+    /*
+        {
+      "type": "schedule",
+      "order": 2,
+      "orientation": "landscape",
+      "content": {
+        "slide-name": "name text",
+        "bgcolor": "hex value",
+        "logo": "img url",
+        "date": "date text",
+        "table": [
+          {
+            "start-time": "text",
+            "end-time": "text",
+            "session-type": "text",
+            "description": "text",
+            "speaker": "text"
+          }
+        ]
+      }
+    },
+    */
+    let table = slide.content.table;
+    let htmlString = '<div class="slide" style="background-color:#'+slide.content.bgcolor+';">';
+    
+    // Create Table and Headers
+    htmlString += '<table class="table table-striped table-bordered"><thead><tr><th scope="col">Start Time</th><th scope="col">End Time</th>'+
+                '<th scope="col">Session Type</th><th scope="col">Description</th><th scope="col">Speaker</th>'+
+                '</tr></thead>';
+    
+    // Create Rows (Need to add logic)
+    htmlString += '<tbody>';
+    for(let i = 0; i < table.length; i++) {
+        let row = table[i];
+        htmlString +=   ''+  
+        '<tr>'+
+          '<td>'+row["start-time"]+'</td>'+
+          '<td>'+row["end-time"]+'</td>'+
+          '<td>'+row["session-type"]+'</td>'+
+          '<td>'+row["description"]+'</td>'+
+          '<td>'+row["speaker"]+'</td>'+
+        '</tr>';
+    }
+    
+    // Close Table and div
+    htmlString += '</tbody></table></div>';
+    return $(htmlString);
+    }
 
 function createVideoSlide(slide) {
+    
+    // Convert normal youtube url to embed link
+    let src = slide.content.link;
+    src = src.replace("watch?v=","embed/");
+    
     let $div = $(
-        '<div class="slide">'+
-        '<div class="force-center"><iframe width="560" height="315" src="https://www.youtube.com/embed/EHs7hBypdNU?autoplay=1&mute=1&controls=0" frameborder="0" picture-in-picture"></iframe></div>'+
-        '</div>'
+        '<div class="slide" style="background-color:#'+slide.content.bgcolor+';"><div class="center">'+
+        '<h1>'+slide.content.title+'</h1>'+
+        '<iframe width="560" height="315" src="'+src+'?autoplay=1&mute=1&controls=0" frameborder="0" picture-in-picture"></iframe>'+
+        '<h3>'+slide.content["description"]+'</h3>'+
+        '</div></div>'
         );
     return $div;
 }
 
 
 function createDonorsSlide(slide) {
-    return $("<h2> Donors Slide Not finished <h2>");
+        let donors = slide.content.donors;
+        let htmlString = '<div class="slide" style="background-color:#'+slide.content.bgcolor+';"><div class="donors">';
+        for(let i = 0; i < donors.length; i++) {
+            let donor = donors[i];
+            htmlString += '<span class="donor"><img src="'+donor.img+'" alt="Img Not Found"></img>'+
+            '<h2>'+donor.name+'</h2><h4>'+donor.description+'</h4></span>';
+        }
+        htmlString += '</div></div>';
+        return $(htmlString);
 }

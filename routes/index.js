@@ -74,35 +74,34 @@ router.post('/upload', function(req, res, next) {
     });
 });
 
+// Add a slide to the JSON list of slides
+function addSlide(key,val){
+    var data = readJson();
+    data.key = val;
+    storeAsJson(data);
+}
 
-    // Add a slide to the JSON list of slides
-    function addSlide(key,val){
-        var data = readJson();
-        data.key = val;
-        storeAsJson(data);
-    }
+// Converts Array to JSON
+function objToJson(arr) { return JSON.stringify(arr); }
 
-    // Converts Array to JSON
-    function objToJson(arr) { return JSON.stringify(arr); }
+// Converts JSON to Array
+function jsonToArray(jsonStr) { return Array.from(jsonStr); }
 
-    // Converts JSON to Array
-    function jsonToArray(jsonStr) { return Array.from(jsonStr); }
+// Store JSON
+function storeAsJson(arr, callback){
+    fs.writeFile(roomsPath+"text.json", arr , function(err) {
+    if(err) { console.log(err); return; }
+    callback(true);
+    });
+}
 
-    // Store JSON
-    function storeAsJson(arr, callback){
-        fs.writeFile(roomsPath+"text.json", arr , function(err) {
+// Read JSON RENAME TO READROOM OR READ JSON
+function readJson(){
+    var data = fs.readFileSync(roomsPath+"text.json", function read(err,data) {
         if(err) { console.log(err); return; }
-        callback(true);
-        });
-    }
-
-    // Read JSON RENAME TO READROOM OR READ JSON
-    function readJson(){
-        var data = fs.readFileSync(roomsPath+"text.json", function read(err,data) {
-            if(err) { console.log(err); return; }
-        });
-        return JSON.parse(data);
-    }
+    });
+    return JSON.parse(data);
+}
 
 
 module.exports = router;
