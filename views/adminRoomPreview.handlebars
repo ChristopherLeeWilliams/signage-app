@@ -90,8 +90,6 @@
     function adjustTimeout(slide) {
       let time = 5000; // 5 seconds
       
-      checkForUpdate();
-      
       if(numSlides <= 1) {
         if(slide && (slide.type === 'video')) {
           time = parseInt(slide.duration) * 1000;
@@ -110,40 +108,10 @@
       }
     }
     
-    function checkForUpdate() {
-      let data = {
-        "roomname": fileContent["roomName"],
-        "lastModified": fileContent["lastModified"],
-        "fileDate": fileContent["date"]
-      };
-      
-      console.log("Data checking for update: %o", data);
-      
-      $.ajax( {
-        url : "/isValid",
-        type : "POST",
-        data : data,
-        fail : function(err){ 
-          alert("There was an error, refreshing page");
-          refreshPage();
-          
-        },
-        success : function(result) { 
-          console.log("Success: " + result);
-          if(!result) { refreshPage(); }
-        },
-        done : function(result){ console.log(result); }
-      } );
-    }
-    
     function displaySlide(slide) {
       // get rid of old content and show new content
       $('#slides').empty();
       $('#slides').append(slide.content);
-    }
-    
-    function refreshPage() {
-      window.location.reload();
     }
     
     function updateDisplay() {
@@ -151,8 +119,6 @@
      displaySlide(slideshow[currentSlide]);
      adjustTimeout(slideshow[currentSlide]);
     }
-    
-    
 
     updateDisplay();
   });

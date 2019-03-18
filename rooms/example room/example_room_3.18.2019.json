@@ -2,12 +2,12 @@
   "roomName": "example room",
   "update": true,
   "date": "3.18.2019",
-  "lastModified": "2019-03-18T05:41:13.447Z",
+  "lastModified": "2019-03-18T22:00:01.840Z",
   "slides": [
     {
       "type": "fullscreen",
       "order": "1",
-      "slideName": "Test Slide Cargo",
+      "slideName": "Slide 1 Sponsors",
       "content": {
         "img": "/home/ubuntu/workspace/signageApp/public/images/slide1.jpg"
       }
@@ -15,34 +15,33 @@
     {
       "type": "fullscreen",
       "order": "2",
-      "slideName": "Dota",
+      "slideName": "Slide 2 Ad",
       "content": {
         "img": "/home/ubuntu/workspace/signageApp/public/images/slide2.jpg"
       }
     },
     {
-      "type": "fullscreen",
-      "order": "2",
-      "slideName": "Dota",
-      "content": {
-        "img": "/home/ubuntu/workspace/signageApp/public/images/slide3.jpg"
-      }
-    },
-    {
       "type": "schedule",
       "order": "4",
-      "slideName": "Test Schedule",
+      "slideName": "The Pacific Promenade 1-3",
       "orientation": "vertical",
       "content": {
-        "logo": "/home/ubuntu/workspace/signageApp/public/images/pokeball.png",
+        "logo": "/home/ubuntu/workspace/signageApp/public/images/ls-logo.png",
         "bgcolor": "#ffffff",
         "table": [
           {
-            "startTime": "10:00",
-            "endTime": "15:00",
+            "startTime": "16:15",
+            "endTime": "17:00",
             "sessionType": "Open Session",
-            "description": "Talks and stuff",
-            "speaker": "Me"
+            "description": "Special Interview of Two Hall of Fame Athletes",
+            "speaker": ""
+          },
+          {
+            "startTime": "17:00",
+            "endTime": "",
+            "sessionType": "Open Session",
+            "description": "Welcome Reception & St. Patrick's Day Party",
+            "speaker": ""
           }
         ]
       }

@@ -84,6 +84,7 @@ router.get('/admin/room/:name/:file', function(req, res, next) {
             
             data = JSON.stringify(data);
             
+            
             // Data has json file content, does it contain list of needed images to send links for?
             res.render('adminDate', { fileContent: data, roomName: roomName, fileName: fileName, layout: false } );
         });
@@ -121,6 +122,35 @@ router.get('/room/:name', function(req, res, next) {
     });
 });
 
+
+// Rendering a file manually, does not receive live updates
+router.get('/room/:name/:fileName', function(req, res, next) {
+    // whenever a file request is made, check that tracker is up to date
+    const roomName = req.params.name;
+    const daySchedule = req.params.fileName;
+    
+    const fullPath = roomsPath + roomName + "/" + daySchedule; 
+    
+    fs.access(fullPath, fs.F_OK, err => {
+        if(err) { res.send("Todays schedule has not been made"); return; } // file does not exist
+        
+        //res.send(fullPath + " exists!");
+        fs.readFile(fullPath, 'utf8', function read(err, data) {
+            if (err) { res.send("Error reading"); console.log(err); return; }
+            
+            data = JSON.parse(data);
+            // check stuff here
+            
+            data = JSON.stringify(data);
+
+            
+            // Data has json file content, does it contain list of needed images to send links for?
+            res.render('adminRoomPreview', { fileContent: data, layout: false } );
+        });
+    });
+});
+
+
 /*
     Given the room name, date of file, and last modified date of file
     Return:
@@ -136,7 +166,13 @@ router.post('/isValid', function(req, res, next) {
         console.log("Data sent: %o", data);
         const fileName = roomNameToDaySchedule(data["roomname"]);
         
+        console.log("Looking for file: " + fileName);
+        
         const validData = roomsFileTracker[fileName];
+        
+        console.log("Comparing valid: %o", validData);
+        console.log("With: %o", data);
+        
         if(!validData) {res.send(false);}
         let valid = (data["lastModified"] === validData["lastModified"]);
         valid &= (data["fileDate"] === validData["fileDate"]);
@@ -201,7 +237,7 @@ function populateRoomsFileTracker() {
                     else {
                         data = JSON.parse(data);
                         // check stuff here
-                        updateRoomsFileTracker(daySchedule, data["last-modified"], data["date"]);
+                        updateRoomsFileTracker(daySchedule, data["lastModified"], data["date"]);
                     }
                 });
             });
@@ -282,6 +318,64 @@ router.post('/createDate', function(req, res, next) {
   });
 });
 
+router.post('/deleteSlide', function(req, res, next) {
+    try {
+        // rooms path
+        let roomDate = req.body.fileName;
+        let roomName = req.body.roomName;
+        let slideName = req.body.slideName;
+        let fullPath = roomsPath + "/" + roomName + "/" + roomDate;
+        
+        console.log("Fullpath: "+fullPath);
+        fs.access(fullPath, fs.F_OK, err => {
+            if(err) { res.send("File does not exist"); return; } // file does not exist
+            
+            //res.send(fullPath + " exists!");
+            fs.readFile(fullPath, 'utf8', function read(err, data) {
+                if (err) { res.send("Error"); console.log(err); return; }
+                
+                data = JSON.parse(data);
+                
+                let newSlides = [];
+                
+                let oldSlides = data.slides;
+                
+                for(let i = 0; i < oldSlides.length; i++) {
+                    let slide = oldSlides[i];
+                    if(slide.slideName === slideName) {
+                        // skip [WILL DELETE ALL WITH SAME roomName]
+                    } else {
+                        newSlides.push(slide);
+                    }
+                }
+                
+                data.slides = newSlides;
+                
+                // CHANGE lastModified DATE
+                data["lastModified"] = new Date();
+                
+                data = JSON.stringify(data);
+                
+                fs.writeFile(fullPath, data, function (err) {
+                    if (err) {
+                        res.send("Failed");
+                        return;
+                    } else {
+                        res.send("Slide Deleted!");
+                        return;
+                    }
+                });
+            });
+        });
+    
+    } catch (e) {
+        console.log(e);
+        res.send("fail");
+    }
+});
+
+
+
 router.post('/uploadFullscreen', function(req, res, next) {
     try {
     let slideList = {};
@@ -328,6 +422,9 @@ router.post('/uploadFullscreen', function(req, res, next) {
                 
                 data = JSON.parse(data);
                 data.slides.push(slideList);
+                
+                // CHANGE lastModified DATE
+                data["lastModified"] = new Date();
                 
                 data = JSON.stringify(data);
                 
@@ -432,6 +529,10 @@ router.post('/uploadSchedule', function(req, res, next) {
                         data = JSON.parse(data);
                         // Update variable, Rewrite the file
                         data.slides.push(slideList);
+                        
+                        // CHANGE lastModified DATE
+                        data["lastModified"] = new Date();
+                        
                         data = JSON.stringify(data);
                         
                         

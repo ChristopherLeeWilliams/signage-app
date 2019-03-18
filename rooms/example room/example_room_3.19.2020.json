@@ -1,0 +1,27 @@
+{
+  "roomName": "example room",
+  "update": true,
+  "date": "3.19.2019",
+  "lastModified": "2019-03-18T22:02:52.255Z",
+  "slides": [
+    {
+      "type": "schedule",
+      "order": "4",
+      "slideName": "Test Schedule",
+      "orientation": "vertical",
+      "content": {
+        "logo": "/home/ubuntu/workspace/signageApp/public/images/pokeball.png",
+        "bgcolor": "#ffffff",
+        "table": [
+          {
+            "startTime": "10:00",
+            "endTime": "15:00",
+            "sessionType": "Open Session",
+            "description": "Talks and stuff",
+            "speaker": "Me"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -75,12 +75,15 @@ function createScheduleSlide(slide) {
     },
     */
     let table = slide.content.table;
-    let htmlString = '<div class="slide table-slide" style="background-color:#'+slide.content.bgcolor+';">';
+    let htmlString = '<div class="slide table-slide" style="background-color:'+slide.content.bgcolor+'">';
     
-    htmlString += '<h1>'+slide.content["slide-name"]+'</h1><br>';
+    let img = slide.content.logo;
+    img = img.substring(img.indexOf("/images/"));
+    
+    htmlString += '<div style="font-size: 60px; vertical-align: middle">'+slide["slideName"]+'<img class="table-logo" style="float: right; margin: 10px" src="'+img+'" width="400" height="200"/></div><br>';
     
     // Create Table and Headers
-    htmlString += '<table class="table table-striped schedule-table">'+
+    htmlString += '<table class="table table-striped schedule-table" style="font-size: 20px">'+
                   '<thead class="thead-dark"><tr>'+
                       '<th class="th-s" scope="col">Start Time</th>'+
                       '<th class="th-s" scope="col">End Time</th>'+
@@ -89,20 +92,23 @@ function createScheduleSlide(slide) {
                       '<th class="th-m" scope="col">Speaker</th>'+
                   '</tr></thead>';
     
-    // Create Rows (Need to add logic)
-    htmlString += '<tbody>';
-    for(let i = 0; i < table.length; i++) {
-        let row = table[i];
-        htmlString +=   ''+  
-        '<tr>'+
-          '<td>'+row["start-time"]+'</td>'+
-          '<td>'+row["end-time"]+'</td>'+
-          '<td>'+row["session-type"]+'</td>'+
-          '<td>'+row["description"]+'</td>'+
-          '<td>'+row["speaker"]+'</td>'+
-        '</tr>';
+    if(Array.isArray(table)) {
+        // Create Rows (Need to add logic)
+        htmlString += '<tbody>';
+        for(let i = 0; i < table.length; i++) {
+            if(typeof table[i]["startTime"] !== 'undefined') {
+                let row = table[i];
+                htmlString +=   ''+  
+                '<tr>'+
+                  '<td>'+row["startTime"]+'</td>'+
+                  '<td>'+row["endTime"]+'</td>'+
+                  '<td>'+row["sessionType"]+'</td>'+
+                  '<td>'+row["description"]+'</td>'+
+                  '<td>'+row["speaker"]+'</td>'+
+                '</tr>';
+            }
+        }
     }
-    
     // Close Table and div
     htmlString += '</tbody></table></div>';
     return $(htmlString);
