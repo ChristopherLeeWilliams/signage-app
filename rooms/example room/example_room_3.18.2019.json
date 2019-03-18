@@ -27,6 +27,25 @@
       "content": {
         "img": "/home/ubuntu/workspace/signageApp/public/images/slide3.jpg"
       }
+    },
+    {
+      "type": "schedule",
+      "order": "4",
+      "slideName": "Test Schedule",
+      "orientation": "vertical",
+      "content": {
+        "logo": "/home/ubuntu/workspace/signageApp/public/images/pokeball.png",
+        "bgcolor": "#ffffff",
+        "table": [
+          {
+            "startTime": "10:00",
+            "endTime": "15:00",
+            "sessionType": "Open Session",
+            "description": "Talks and stuff",
+            "speaker": "Me"
+          }
+        ]
+      }
     }
   ]
 }

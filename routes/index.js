@@ -356,140 +356,93 @@ router.post('/uploadSchedule', function(req, res, next) {
     console.log("In upload schedule");
     // NEED TO HAVE ROOM NAME AND/OR the ROOM DATE    
     try {
-          const typeKey = "type";
-          const slideType = "schedule";
-          const orderKey = "order"
-          const tableKey = "table";
-          const contentKey = "content";
-          const slideKey = "slideName";
-          const bgKey = "bgcolor";
-          const logoKey = "logo";
-          const orientationKey = "orientation";
-          const nameKey = "slideName";
-          
-          let slideList = {};
-          let slideContent = {};
-          let slideName = req.body.slidename;
-          let bgcolor = req.body.bgcolor;
-          let orderNum = req.body.ordernum;
-          let orientation = req.body.orientation;
+        let slideList = {};
+        let slideName = req.body.slidename;
+        let bgcolor = req.body.bgcolor;
+        let orderNum = req.body.ordernum;
+        let orientation = req.body.orientation;
+        let imgFileName = req.body.imageName;
+        let logoFile = req.files.logo;
         
-          // Check if table contains multiple rows
-          let multipleRows = Array.isArray(req.body.startTime);
-          let rowCount = req.body.startTime.length;
-          
-          // Create array to hold rows
-          let rowList = [];
-          let tableList = {};
+        // Get img path
+        let imgFilePath = path.join(__dirname,"../public/images/",imgFileName);
         
-          // Only iterate through table if multiple rows
-          if (multipleRows) {
-            for (let i = 0; i < rowCount; i++) {
-              // An array holding the information of the slides
-              tableList = {
-                startTime: req.body.startTime[i],
-                endTime: req.body.endTime[i],
-                sessionType: req.body.sessionType[i],
-                description: req.body["description"][i], // description is a keyword
-                speaker: req.body.speaker[i]
+        // Get full path to json file
+        let roomDate = req.body.fileName;
+        let roomName = req.body.roomName;
+        let fullPath = roomsPath + roomName + "/" + roomDate;
         
-              };
+        console.log("Full path of json: " + fullPath );
         
-              rowList.push(tableList);
+        // Check if table contains multiple rows
+        let multipleRows = Array.isArray(req.body.startTime);
         
-            }
-          } else {
-            tableList = {
-              startTime: req.body.startTime,
-              endTime: req.body.endTime,
-              sessionType: req.body.sessionType,
-              description: req.body["description"],
-              speaker: req.body.speaker
+        // Create array to hold rows
+        let rowList = [];
         
-            };
-        
-            rowList.push(tableList);
-        
-          }
-        
-          //Construct the slide list
-          slideContent[slideKey] = slideName;
-          slideContent[bgKey] = bgcolor;
-          slideContent[tableKey] = rowList;
-          
-        
-          // CREATE ORDER
-          // ------------
-        
-          // Get orientation
-          // ------------
-        
-          // LOGO UPLOAD
-        
-        
-          let fileName = req.body.imageName;
-          
-          // Use the mv() method to place the file somewhere on your server
-          let filePath = '../public/images/' + fileName;
-          
-        
-          let logoFile = req.files.logo;
-        
-        
-          // Transfer file to location
-          logoFile.mv(filePath, function (err) {
-            if (err) { return res.status(500).send(err); }
-        
-            //Continued consturct slide list
-            slideContent[logoKey] = filePath;
-            slideList["type"] = "schedule";
-            slideList["order"] = orderNum;
-            slideList[nameKey] = slideName;
-            slideList[orientationKey] = orientation;
-            slideList[contentKey] = slideContent;
-        
-        
-            // JSON version of slideList
-            let jsonList = JSON.stringify(slideList);
-            console.log("[uploading] json list : " + jsonList);
-            
-            
-            // rooms path
-            let roomDate = req.body.fileName;
-            let roomName = req.body.fileName;
-            let fullPath = roomsPath + "/" + roomName + "/" + roomDate;
-            
-            // Open the file
-            // Store file data in var
-            // Update variable
-            // Rewrite the file
-            
-            
-            
-            fs.access(fullPath, fs.F_OK, err => {
-                if(err) { res.send("File does not exist"); return; } // file does not exist
-                
-                //res.send(fullPath + " exists!");
-                fs.readFile(fullPath, 'utf8', function read(err, data) {
-                    if (err) { res.send("Error"); console.log(err); return; }
-                    
-                    data = JSON.parse(data);
-                    
-                    data.slides.push(jsonList);
-                    
-                    fs.writeFile(fullPath, data, function (err) {
-                      if (err) {
-                          res.send("Failed");
-                        
-                      } else {
-                        res.send("Schedule Uploaded!");
-                      }
-                
-                    });
-                    
+        // Only iterate through table if multiple rows
+        if (multipleRows) {
+            for (let i = 0; i < req.body.startTime.length; i++) {
+                // An array holding the information of the slides
+                rowList.push({
+                    startTime: req.body.startTime[i],
+                    endTime: req.body.endTime[i],
+                    sessionType: req.body.sessionType[i],
+                    description: req.body["description"][i], // description is a keyword
+                    speaker: req.body.speaker[i]
                 });
+            }
+        } else {
+            rowList.push({
+                startTime: req.body.startTime,
+                endTime: req.body.endTime,
+                sessionType: req.body.sessionType,
+                description: req.body["description"],
+                speaker: req.body.speaker
             });
-          });
+        }
+        
+        // Transfer file to location. Use the mv() method to place the file somewhere on your server
+        logoFile.mv(imgFilePath, function (err) {
+            if (err) { res.send("Error:"+err ); }
+            else { 
+                //Continued consturct slide list
+                slideList["type"] = "schedule";
+                slideList["order"] = orderNum;
+                slideList["slideName"] = slideName;
+                slideList["orientation"] = orientation;
+                slideList["content"] = {
+                    "logo": imgFilePath,
+                    "bgcolor" : bgcolor,
+                    "table": rowList
+                };
+                
+                // JSON version of slideList
+                // let jsonList = JSON.stringify(slideList);
+                // console.log("[uploading] json list : " + jsonList);
+                
+                // Open the file
+                fs.access(fullPath, fs.F_OK, err => {
+                    if(err) { res.send("File does not exist"); return; } // file does not exist
+                    
+                    fs.readFile(fullPath, 'utf8', function read(err, data) {
+                        if (err) { res.send("Error"); console.log(err); return; }
+                        
+                        // Store file data in var
+                        data = JSON.parse(data);
+                        // Update variable, Rewrite the file
+                        data.slides.push(slideList);
+                        data = JSON.stringify(data);
+                        
+                        
+                        fs.writeFile(fullPath, data, function (err) {
+                            if (err) { res.send("Failed"); } 
+                            else { res.send("Schedule Uploaded!"); }
+                        });
+                    });
+                });
+            }
+        });
     } catch (e) {
         console.log(e);
         res.send("Error: " + e);

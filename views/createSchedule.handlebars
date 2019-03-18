@@ -135,8 +135,8 @@
 
   <script>
     $(document).ready(function () {
-      let roomName = "{{roomName}}";
-      let fileName = "{{fileName}}";
+      let roomName = "{{room}}";
+      let fileName = "{{file}}";
       
       // Setting number of rows
       $("#addRow").click(function () {
@@ -152,8 +152,9 @@
       });
 
       // Submit button action
-      $("form#slideForm").submit(function (event) {
+      $("#slideForm").submit(function (event) {
         event.preventDefault();
+        
         let form = $("#slideForm")[0];
         let formData = new FormData(form);
         let imageFile = document.getElementById("logo");
@@ -179,7 +180,7 @@
           },
           success: function (result) {
             alert(result);
-            window.location = "/admin/"+roomName;
+            // window.location = "/admin/"+roomName;
 
           },
           done: function (result) {
