@@ -1,0 +1,192 @@
+<html>
+
+<head>
+    <title>Signage</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+
+
+    <style>
+        .form-div{
+            margin: 0 auto;
+            width:80%;
+        }
+
+        #separator{
+            font-size : 2em;
+        }
+
+  </style>
+</head>
+
+<script>
+    //PLACEHOLDERS
+let roomName = "Blue_Room";
+let date = "";
+
+</script>
+
+<body>
+
+    <div class="row justify-content-center align-items-center">
+        <h1 class="display-3">Create Cover Slide</h1>
+    </div>
+
+    <form id="coverForm">
+        <div class="form-div">
+            <div class="form-group row">
+                <label for="slidename" class="col-sm-2 col-form-label">Slide Name </label>
+                <div class="col-sm-10">
+                    <input class="form-control" id="slidename" type="TEXT" name="slidename" size="15" placeholder="Name of slide (i.e. 'Blue Room Cover Page')"
+                        required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="ordernum" class="col-sm-2 col-form-label"> Order Number </label>
+                <div class="col-sm-10">
+                    <input class="form-control" id="ordernum" type="NUMBER" name="ordernum" size="1" required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="orientation" class="col-sm-2 col-form-label">Orientation </label>
+                <div class="col-sm-10">
+                    <select class="form-control" id="orientation">
+                        <option value="vertical">
+                            Vertical
+                        </option>
+                        <option value="horizontal">
+                            Horizontal
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row vertical-center">
+                <label class="col-sm-2 col-form-label">Background Color </label>
+                <div class="col-sm-1">
+                    <input class="form-control" id="bgcolor" type="COLOR" name="bgcolor" value="#3C53C4" required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="title" class="col-sm-2 col-form-label">Title </label>
+                <div class="col-sm-10">
+                    <input class="form-control" id="title" type="TEXT" name="title" size="15" placeholder="Title in the center of screen (i.e. 'Main Conference Room')"
+                        required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="subTitle" class="col-sm-2 col-form-label">Subtitle </label>
+                <div class="col-sm-10">
+                    <input class="form-control" id="subTitle" type="TEXT" name="subTitle" size="15" placeholder="Subtitle below title (i.e. 'Welcome')"
+                        required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <hr>
+                </div>
+                <div class="col-auto " id="separator">Images</div>
+                <div class="col">
+                    <hr>
+                </div>
+            </div>
+
+            <label for="title" class="col-sm-2 col-form-label">Header Logo </label>
+
+            <div class="form-group row">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="headerLogo" type="file" name="headerLogo">
+                    <label class="custom-file-label" id="headerLogoLabel" for="headerLogo">Choose Header Logo...</label>
+                </div>
+            </div>
+
+            <label for="title" class="col-sm-2 col-form-label">Footer Logo </label>
+
+            <div class="form-group row">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="footerLogo" type="file" name="footerLogo">
+                    <label class="custom-file-label" id="footerLogoLabel" for="footerLogo">Choose Footer Logo...</label>
+                </div>
+            </div>
+            <input class="btn btn-primary" type='submit' value='Submit' />
+
+        </div>
+    </form>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"> </script>
+
+    <script>
+        $(document).ready(function () {
+            // Set default color to something with 120 lum
+            document.getElementById("bgcolor").value = "#3C53C4";
+
+
+            // Submit button action
+            $("form#coverForm").submit(function (event) {
+                event.preventDefault();
+                let form = $("#coverForm")[0];
+                let formData = new FormData(form);
+
+                let hLogo = document.getElementById("headerLogo");
+                let headerLogo = hLogo.files[0];
+                let fLogo = document.getElementById("footerLogo");
+                let footerLogo = fLogo.files[0];
+                let orientation = $("#orientation").val();
+
+                formData.append('headerFile', headerLogo);
+                formData.append('footerFile', footerLogo);
+
+                formData.append('headerImageName', headerLogo.name);
+                formData.append('footerImageName', footerLogo.name);
+
+                formData.append('orientation', orientation);
+
+
+                $.ajax({
+                    url: "/uploadCover",
+                    type: "POST",
+                    enctype: "multipart/form-data",
+                    processData: false,
+                    data: formData,
+                    contentType: false,
+                    fail: function (err) {
+                        console.log(err);
+
+                    },
+                    success: function (result) {
+                        alert(result);
+
+                    },
+                    done: function (result) {
+                        alert(result);
+
+                    }
+                });
+            });
+
+            // For file upload
+            $("#headerLogo").on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings("#headerLogoLabel").addClass("selected").html(fileName);
+            });
+
+            // For file upload
+            $("#footerLogo").on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings("#footerLogoLabel").addClass("selected").html(fileName);
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

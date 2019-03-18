@@ -1,0 +1,124 @@
+<html>
+
+<head>
+  <title>Signage</title>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <style>
+    .form-div{
+        margin: 0 auto;
+        width:80%;
+    }
+
+    #separator{
+        font-size : 2em;
+    }
+
+
+  </style>
+</head>
+
+<body>
+
+  <div class="row justify-content-center align-items-center">
+    <h1 class="display-3">Create Fullscreen Slide</h1>
+  </div>
+
+  <form id="slideForm">
+    <div class="form-div">
+      <div class="form-group row">
+        <label for="slidename" class="col-sm-2 col-form-label">Slide Name </label>
+        <div class="col-sm-10">
+          <input class="form-control" id="slidename" type="TEXT" name="slidename" size="15" placeholder="Name of slide (i.e. 'Entertainment Lineup')"
+            required>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="ordernum" class="col-sm-2 col-form-label"> Order Number </label>
+        <div class="col-sm-10">
+          <input class="form-control" id="ordernum" type="NUMBER" name="ordernum" size="1" required>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col"><hr></div>
+        <div class="col-auto " id="separator">Upload Fullscreen Image</div>
+        <div class="col"><hr></div>
+      </div>
+      </br>
+
+      <div class="form-group row">
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" id="logo" type="file" name="logo">
+          <label class="custom-file-label" for="logo">Choose file...</label>
+        </div>
+      </div>
+
+      <br><br>
+      <input class="btn btn-primary" type='submit' value='Submit' />
+
+    </div>
+  </form>
+
+  <script>
+    $(document).ready(function () {
+      
+      let roomName = "{{room}}";
+      let fileName = "{{file}}";
+      
+
+      // Submit button action
+      $("#slideForm").submit(function (event) {
+        //var formData = new FormData(document.getElementById('slideForm'));
+        
+        event.preventDefault();
+        
+        let form = $("#slideForm")[0];
+        let formData = new FormData(form);
+        let imageFile = document.getElementById("logo");
+        let image = imageFile.files[0];
+        let orientation = $("#orientation").val();
+        formData.append('imageName', image.name);
+        formData.append('orientation', orientation);
+        formData.append('roomName', roomName);
+        formData.append('fileName', fileName);
+        
+        console.log(formData.get('logo'));
+        
+        $.ajax({
+          url: "/uploadFullscreen",
+          type: "POST",
+          enctype: "multipart/form-data",
+          processData: false,
+          data: formData,
+          contentType: false,
+          fail: function (err) {
+            console.log(err);
+
+          },
+          success: function (result) {
+            alert(result);
+            window.location="/admin/room/"+roomName+"/"+fileName;
+
+          },
+          done: function (result) {
+            alert(result);
+
+          }
+        });
+      });
+
+      // For file upload
+      $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+      });
+
+    });
+  </script>
+</body>
+
+</html>

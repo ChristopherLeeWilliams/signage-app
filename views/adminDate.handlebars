@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<style>
+  
+</style>
+
+</head>
+<body style="margin:2%; text-align:center">
+  
+  <table class="table table-striped table-dark">
+    <thead>
+      <tr>
+        <th scope="col"><h1>Slides</h1></th>
+      </tr>
+    </thead>
+    <tbody id="slides">
+    </tbody>
+  </table>
+  
+  <a type="button" class="btn btn-primary" href="/createFullscreen/{{roomName}}/{{fileName}}"> Create Full Screen Slide</a>
+  <a type="button" class="btn btn-primary" href="/createSchedule/{{roomName}}/{{fileName}}"> Create Schedule Slide</a>
+  <a type="button" class="btn btn-primary" href="/createVideo/{{roomName}}/{{fileName}}"> Create Video Slide</a>
+  
+  <script>
+    $( document ).ready(function() {
+      const fileContent = {{{fileContent}}};
+      const roomName = "{{roomName}}";
+      
+      const slides = fileContent.slides;
+      
+      let htmlString = "";
+      
+      slides.forEach(function(slide) {
+        htmlString += '<tr><th scope="row">Type: '+slide.type+' Order: '+slide.order+'</th></tr>';
+      });
+      
+      $('#slides').append($(htmlString));
+      
+    });
+  </script>
+</body>
+</html>

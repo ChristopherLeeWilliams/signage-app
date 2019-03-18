@@ -1,7 +1,7 @@
 {
-  "roomname": "text",
+  "roomname": "blue room",
   "update": true,
-  "date": "3.15.2019",
+  "date": "3.17.2019",
   "last-modified": "date time",
   "slides": [
     {
@@ -31,14 +31,14 @@
             "end-time": "12:00",
             "session-type": "Open",
             "description": "text",
-            "speaker": "Guy1"
+            "speaker": "Blue GUy 1"
           },
           {
             "start-time": "12:10",
             "end-time": "14:00",
             "session-type": "Open",
             "description": "text",
-            "speaker": "Guy2"
+            "speaker": "Blue Guy 2"
           },
           {
             "start-time": "14:10",

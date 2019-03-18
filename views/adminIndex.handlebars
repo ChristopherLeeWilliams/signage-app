@@ -9,6 +9,8 @@
 </head>
 <body style="margin:2%; text-align:center">
   
+  <h3>Admin</h3>
+  
   <table class="table table-striped table-dark">
     <thead>
       <tr>
@@ -18,12 +20,12 @@
     <tbody>
       {{#each rooms}}
           <tr><th scope="row">
-            <a href="/room/{{this}}">{{this}}</a>
+            <a href="/admin/room/{{this}}">{{this}}</a>
           </th></tr>
       {{/each}}
     </tbody>
   </table>
   
-  <a type="button" class="btn btn-primary" href="/admin"> Admin </a>
+  <a type="button" class="btn btn-primary" href="/createRoom"> Create Room </a>
 </body>
 </html>

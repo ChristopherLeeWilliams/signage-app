@@ -1,0 +1,72 @@
+<html>
+
+<head>
+    <title>Signage</title>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+        .form-div{
+        margin: 0 auto;
+        width:80%;
+      }
+
+  </style>
+</head>
+
+<body>
+
+    <div class="row justify-content-center align-items-center">
+        <h1 class="display-3">Create Date</h1>
+    </div>
+
+    <form id="dateForm">
+        <div class="form-div">
+            <div class="form-group row">
+                <label for="slidename" class="col-sm-2 col-form-label">Select a Date</label>
+                <div class="col-sm-10">
+                    <input class='form-control' type='DATE' name='date' required>
+                </div>
+            </div>
+
+            <input class="btn btn-primary" type='submit' value='Submit' />
+
+        </div>
+    </form>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"> </script>
+
+    <script>
+        let roomName = "{{room}}";
+        console.log("Room name: " + roomName);
+    
+        // Submit button action
+        $("#dateForm").submit(function (event) {
+            event.preventDefault();
+            var formData = $('#dateForm').serializeArray();
+            formData.push({name:"roomName", value: roomName});
+
+            $.ajax({
+                url: "/createDate",
+                type: "POST",
+                data: formData,
+                fail: function (err) {
+                    console.log(err);
+
+                },
+                success: function (result) {
+                    alert(result);
+                    window.location="/admin/room/"+roomName;
+
+                },
+                done: function (result) {
+                    alert(result);
+
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

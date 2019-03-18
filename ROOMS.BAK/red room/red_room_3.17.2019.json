@@ -1,4 +1,8 @@
 {
+  "roomname": "red room",
+  "update": true,
+  "date": "3.17.2019",
+  "last-modified": "date time",
   "slides": [
     {
       "type": "cover",
@@ -27,14 +31,14 @@
             "end-time": "12:00",
             "session-type": "Open",
             "description": "text",
-            "speaker": "Guy1"
+            "speaker": "Red Guy 1"
           },
           {
             "start-time": "12:10",
             "end-time": "14:00",
             "session-type": "Open",
             "description": "text",
-            "speaker": "Guy2"
+            "speaker": "Red Guy 2"
           },
           {
             "start-time": "14:10",

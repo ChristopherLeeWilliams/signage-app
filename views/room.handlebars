@@ -2,22 +2,68 @@
 <html>
 <head>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 <style>
-  .slide {
-    height: 100vh;
+  html, body {
+      min-height: 100%;
+      min-width: 100%;
   }
   .center {
     text-align: center;
   }
+  
   .donors {
     display: inline-block;
   }
+  
   .donor {
     display: inline-block;
     text-align: center;
+  }
+  
+  .schedule-table {
+    border-bottom: 1px solid black;
+  }
+  
+  .schedule-table td,  .schedule-table th{
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+  }
+  
+  .th-s , .td-s{
+    width: 4vw;
+  }
+  
+  .th-m, .td-m{
+    width: 8vw;
+  }
+
+  .th-l, .td-l{
+    width: 14vw;
+  }
+  
+  .slides {
+    height: 100%;
+    width: 100%;
+  }
+  
+  .slide {
+    height: 100vh;
+    padding: 1%;
+  }
+  
+  .fullscreen-slide {
+    height: 100vh;
+    max-height: 100%;
+    width: 100%;
+    text-align:center;
+  }
+  
+  .fullscreen-image {
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
   }
 </style>
 </head>
@@ -29,17 +75,63 @@
 <script src="/javascripts/slides.js"></script>
 <script>
   $( document ).ready(function() {
+    const serverTime = "{{serverTime}}";
+    
+    const fileContent = {{{fileContent}}};
+    
     // Create ordered slideshow 
-    const slideshow = createSlideShow(({{{fileContent}}}).slides);
+    const slideshow = createSlideShow(fileContent, serverTime);
     
     // Begin cycling the display of the slideshow
     let currentSlide = 0;
     const numSlides = slideshow.length;
     
-    function updateDisplay() {
-     currentSlide = currentSlide % numSlides;
-     displaySlide(slideshow[currentSlide]);
-     adjustTimeout(slideshow[currentSlide]);
+    
+    function adjustTimeout(slide) {
+      let time = 5000; // 5 seconds
+      
+      checkForUpdate();
+      
+      if(numSlides <= 1) {
+        if(slide && (slide.type === 'video')) {
+          time = parseInt(slide.duration) * 1000;
+          setTimeout(updateDisplay, time);
+        } else {
+          setTimeout(adjustTimeout, time);
+        }
+        return;
+      }
+      currentSlide++;
+      if(slide.type === 'video') {
+        time = parseInt(slide.duration) * 1000;
+        setTimeout(updateDisplay, time); // make special video wipe to not reload every time?
+      } else {
+        setTimeout(updateDisplay, time);
+      }
+    }
+    
+    function checkForUpdate() {
+      let data = {
+        "roomname": fileContent["roomname"],
+        "lastModified": fileContent["last-modified"],
+        "fileDate": fileContent["date"]
+      };
+      
+      $.ajax( {
+        url : "/isValid",
+        type : "POST",
+        data : data,
+        fail : function(err){ 
+          alert("There was an error, refreshing page");
+          refreshPage();
+          
+        },
+        success : function(result) { 
+          console.log("Success: " + result);
+          if(!result) { refreshPage(); }
+        },
+        done : function(result){ console.log(result); }
+      } );
     }
     
     function displaySlide(slide) {
@@ -48,16 +140,18 @@
       $('#slides').append(slide.content);
     }
     
-    function adjustTimeout(slide) {
-      if(numSlides <= 1) {return;}
-      currentSlide++;
-      if(slide.type === 'video') {
-        let time = parseInt(slide.duration) * 1000;
-        setTimeout(updateDisplay, time); // make special video wipe to not reload every time?
-      } else {
-        setTimeout(updateDisplay, 3000);
-      }
+    function refreshPage() {
+      window.location.reload();
     }
+    
+    function updateDisplay() {
+     currentSlide = currentSlide % numSlides;
+     displaySlide(slideshow[currentSlide]);
+     adjustTimeout(slideshow[currentSlide]);
+    }
+    
+    
+
     updateDisplay();
   });
 

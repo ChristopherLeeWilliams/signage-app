@@ -1,0 +1,199 @@
+<html>
+
+<head>
+    <title>Signage</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+
+
+    <style>
+        .form-div{
+            margin: 0 auto;
+            width:80%;
+        }
+
+        #separator{
+            font-size : 2em;
+        }
+
+        .col-centered{
+            margin: 0 auto;
+
+            float: none;
+        }
+
+
+  </style>
+</head>
+
+<script>
+    //PLACEHOLDERS
+let roomName = "Blue_Room";
+let date = "";
+
+</script>
+
+<body>
+
+    <div class="row justify-content-center align-items-center">
+        <h1 class="display-3">Create Video Slide</h1>
+    </div>
+
+    <form id="videoForm">
+        <div class="form-div">
+            <div class="form-group row">
+                <label for="slidename" class="col-sm-2 col-form-label">Slide Name </label>
+                <div class="col-sm-10">
+                    <input class="form-control" id="slidename" type="TEXT" name="slidename" size="15" placeholder="Name of slide (i.e. 'Blue Room Video Slide')"
+                        required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="ordernum" class="col-sm-2 col-form-label"> Order Number </label>
+                <div class="col-sm-10">
+                    <input class="form-control" id="ordernum" type="NUMBER" name="ordernum" size="1" required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="orientation" class="col-sm-2 col-form-label">Orientation </label>
+                <div class="col-sm-10">
+                    <select class="form-control" id="orientation">
+                        <option value="vertical">
+                            Vertical
+                        </option>
+                        <option value="horizontal">
+                            Horizontal
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row vertical-center">
+                <label class="col-sm-2 col-form-label">Background Color </label>
+                <div class="col-sm-1">
+                    <input class="form-control" id="bgcolor" type="COLOR" name="bgcolor" value="#3C53C4" required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="title" class="col-sm-2 col-form-label">Title </label>
+                <div class="col-sm-10">
+                    <input class="form-control" id="title" type="TEXT" name="title" size="15" placeholder="Title new video if not full screen"
+                        required>
+                </div>
+            </div>
+            </br>
+
+            <div class="row">
+                <div class="col">
+                    <hr>
+                </div>
+                <div class="col-auto " id="separator">Video</div>
+                <div class="col">
+                    <hr>
+                </div>
+            </div>
+            </br>
+
+            <div class="form-group row">
+                <label for="videoLink" class="col-sm-2 col-form-label">Video URL </label>
+                <div class="col-sm-10">
+                    <input class="form-control" id="videoLink" type="URL" name="videoLink" size="15" placeholder="https://www.youtube.com/watch?..."
+                        required>
+                </div>
+            </div>
+            </br>
+            </br>
+            <div class="row">
+                <div class="col">
+                    <hr>
+                </div>
+            </div>
+            </br>
+
+            <div class="form-group row ">
+                <div class="col-centered">
+                    <label for="videoLink" class="col-auto col-form-label form-check-inline"> Play Full </label>
+                    <div class="form-check col-auto form-check-inline">
+                        <input class="form-check-input big-checkbox" type="checkbox" value="" id="defaultCheck1">
+                        <label class="form-check-label col-auto" for="defaultCheck1">
+                            Check to play entire video
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group row ">
+                <div class="col-centered">
+                    <div class="col-auto form-check-inline" id="separator"> OR </div>
+                </div>
+            </div>
+
+            <div class="form-group row ">
+                <div class="col-centered">
+                    <div class="col-auto form-check-inline">
+                        <input class="form-control form-check-inline" id="duration" type="NUMBER" name="duration" size="1">
+                    </div>
+                    <div class="col-auto form-check-inline">
+                        <label for="duration" class="col-sm-2 col-form-label "> Seconds </label>
+                    </div>
+                </div>
+            </div>
+
+            <input class="btn btn-primary" type='submit' value='Submit' />
+
+        </div>
+    </form>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"> </script>
+
+    <script>
+        $(document).ready(function () {
+            // Set default color to something with 120 lum
+            document.getElementById("bgcolor").value = "#3C53C4";
+
+
+            // Submit button action
+            $("form#videoForm").submit(function (event) {
+                event.preventDefault();
+                let form = $("#videoForm")[0];
+                let formData = new FormData(form);
+                let orientation = $("#orientation").val();
+                formData.append('orientation', orientation);
+
+                $.ajax({
+                    url: "/uploadVideo",
+                    type: "POST",
+                    enctype: "multipart/form-data",
+                    processData: false,
+                    data: formData,
+                    contentType: false,
+                    fail: function (err) {
+                        console.log(err);
+
+                    },
+                    success: function (result) {
+                        alert(result);
+
+                    },
+                    done: function (result) {
+                        alert(result);
+
+                    }
+                });
+            });
+
+            $("#")
+
+        });
+    </script>
+
+</body>
+
+</html>

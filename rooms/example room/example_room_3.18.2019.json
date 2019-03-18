@@ -1,0 +1,32 @@
+{
+  "roomName": "example room",
+  "update": true,
+  "date": "3.18.2019",
+  "lastModified": "2019-03-18T05:41:13.447Z",
+  "slides": [
+    {
+      "type": "fullscreen",
+      "order": "1",
+      "slideName": "Test Slide Cargo",
+      "content": {
+        "img": "/home/ubuntu/workspace/signageApp/public/images/slide1.jpg"
+      }
+    },
+    {
+      "type": "fullscreen",
+      "order": "2",
+      "slideName": "Dota",
+      "content": {
+        "img": "/home/ubuntu/workspace/signageApp/public/images/slide2.jpg"
+      }
+    },
+    {
+      "type": "fullscreen",
+      "order": "2",
+      "slideName": "Dota",
+      "content": {
+        "img": "/home/ubuntu/workspace/signageApp/public/images/slide3.jpg"
+      }
+    }
+  ]
+}

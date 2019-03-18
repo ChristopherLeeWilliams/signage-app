@@ -1,0 +1,202 @@
+<html>
+
+<head>
+  <title>Signage</title>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <style>
+    .form-div{
+        margin: 0 auto;
+        width:80%;
+    }
+
+    #separator{
+        font-size : 2em;
+    }
+
+
+  </style>
+</head>
+
+<body>
+
+  <div class="row justify-content-center align-items-center">
+    <h1 class="display-3">Create Schedule Slide</h1>
+  </div>
+
+  <form id="slideForm">
+    <div class="form-div">
+      <div class="form-group row">
+        <label for="slidename" class="col-sm-2 col-form-label">Slide Name </label>
+        <div class="col-sm-10">
+          <input class="form-control" id="slidename" type="TEXT" name="slidename" size="15" placeholder="Name of slide (i.e. 'Blue Room Schedule')"
+            required>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="ordernum" class="col-sm-2 col-form-label"> Order Number </label>
+        <div class="col-sm-10">
+          <input class="form-control" id="ordernum" type="NUMBER" name="ordernum" size="1" required>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="orientation" class="col-sm-2 col-form-label">Orientation </label>
+        <div class="col-sm-10">
+          <select class="form-control" id="orientation">
+            <option value="vertical">
+              Vertical
+            </option>
+            <option value="horizontal">
+              Horizontal
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row vertical-center">
+        <label class="col-sm-2 col-form-label">Background Color </label>
+        <div class="col-sm-1">
+          <input class="form-control" id="bgcolor" type="COLOR" name="bgcolor" required>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" id="logo" type="file" name="logo">
+          <label class="custom-file-label" for="logo">Choose file...</label>
+        </div>
+      </div>
+
+      <div class="row">
+          <div class="col"><hr></div>
+          <div class="col-auto " id="separator">Schedule</div>
+          <div class="col"><hr></div>
+      </div>
+    </br>
+      <div class="form-group row">
+
+        <div class="col-md-4 mb-3">
+          <label for="numRows">Select Number of Rows </label>
+        </div>
+        <div class="col-md-4 mb-3">
+          <select class="form-control col-md-4 mb-3" id="numRows">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+            <option>11</option>
+            <option>12</option>
+            <option>13</option>
+            <option>14</option>
+            <option>15</option>
+            <option>16</option>
+            <option>17</option>
+            <option>18</option>
+            <option>19</option>
+            <option>20</option>
+          </select>
+        </div>
+
+        
+
+        <div class="col-md-4 mb-3">
+          <button class="btn btn-secondary" id="addRow">Select Number of Rows</button>
+        </div>
+
+      </div>
+      
+
+
+      <table id="myTable" class="table table-dark">
+        <thead>
+          <th scope="col">Start Time</th>
+          <th scope="col">End Time</th>
+          <th scope="col">Type of Session</th>
+          <th scope="col">Description</th>
+          <th scope="col">Speaker</th>
+        </thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+      <br><br>
+      <input class="btn btn-primary" type='submit' value='Submit' />
+
+    </div>
+  </form>
+
+  <script>
+    $(document).ready(function () {
+      let roomName = "{{roomName}}";
+      let fileName = "{{fileName}}";
+      
+      // Setting number of rows
+      $("#addRow").click(function () {
+        // Clear table
+        $("#myTable").find('tbody').empty();
+
+        let totalRows = $("#numRows").val();
+        for (let i = 0; i < totalRows; i++) {
+          $("#myTable").find('tbody').append(
+            "<tr>            <td><input class='form-control' type='TIME' name='startTime' size='8' required><br></td>            <td><input class='form-control' type='TIME' name='endTime' size='8' required><br></td>            <td>              <div class='input-group mb-3'>                <div class='input-group-prepend'>                  <label class='input-group-text' for='inputGroupSelect01'>Options</label>                </div>                <select class='custom-select' name='sessionType'>                  <option>Open Session</option>                  <option>Private Meeting</option>                  <option>No Session</option>                  <option>End of Day</option>                </select>              </div>            </td>            <td>              <div class='input-group'>                <textarea class='form-control' name='description' rows='4' columns='25'></textarea>              </div>            </td>            <td>              <div class='inpu-group'>                <input class='form-control' type='TEXT' name='speaker' size='20'>              </div>            </td>          </tr>"
+          );
+        }
+      });
+
+      // Submit button action
+      $("form#slideForm").submit(function (event) {
+        event.preventDefault();
+        let form = $("#slideForm")[0];
+        let formData = new FormData(form);
+        let imageFile = document.getElementById("logo");
+        let image = imageFile.files[0];
+        let orientation = $("#orientation").val();
+        formData.append('image', image);
+        formData.append('imageName', image.name);
+        formData.append('orientation', orientation);
+        formData.append('roomName', roomName);
+        formData.append('fileName', fileName);
+
+
+        $.ajax({
+          url: "/uploadSchedule",
+          type: "POST",
+          enctype: "multipart/form-data",
+          processData: false,
+          data: formData,
+          contentType: false,
+          fail: function (err) {
+            console.log(err);
+
+          },
+          success: function (result) {
+            alert(result);
+            window.location = "/admin/"+roomName;
+
+          },
+          done: function (result) {
+            alert(result);
+
+          }
+        });
+      });
+
+      // For file upload
+      $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+      });
+
+    });
+  </script>
+</body>
+
+</html>

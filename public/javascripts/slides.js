@@ -1,10 +1,10 @@
 /*
-    Creates an array of slide html elements in order
+    Creates an array of slide where the content has been converted to html elements
 */
-function createSlideShow(slides) {
+function createSlideShow(room, serverTime) {
     let slideshow = [];
     
-    slides.forEach(function(slide) {
+    room.slides.forEach(function(slide) {
         let temp = slide;
         temp.content = createSlide(slide);
         slideshow.push(temp);
@@ -25,6 +25,8 @@ function createSlide(slideJson) {
             return createVideoSlide(slideJson);
         case 'donors':
             return createDonorsSlide(slideJson);
+        case 'fullscreen':
+            return createFullscreenSlide(slideJson);
         default:
             return $('<h2>Unknown Slide Type<h2>');
     }
@@ -39,6 +41,13 @@ function createCoverSlide(slide) {
         '<h3 style="text-align: center;">'+slide.content.subtitle+'</h3>'+
         '<p><img style="display: block; margin-left: auto; margin-right: auto;" src="'+slide.content["footer-logo"]+'" alt=""/></p></div>'
         );
+    return $div;
+}
+
+function createFullscreenSlide(slide) {
+    let img = slide.content.img;
+    img = img.substring(img.indexOf("/images/"));
+    let $div = $( '<div class="fullscreen-slide"><img class="fullscreen-image" src="'+img+'"/></div>' );
     return $div;
 }
 
@@ -66,12 +75,19 @@ function createScheduleSlide(slide) {
     },
     */
     let table = slide.content.table;
-    let htmlString = '<div class="slide" style="background-color:#'+slide.content.bgcolor+';">';
+    let htmlString = '<div class="slide table-slide" style="background-color:#'+slide.content.bgcolor+';">';
+    
+    htmlString += '<h1>'+slide.content["slide-name"]+'</h1><br>';
     
     // Create Table and Headers
-    htmlString += '<table class="table table-striped table-bordered"><thead><tr><th scope="col">Start Time</th><th scope="col">End Time</th>'+
-                '<th scope="col">Session Type</th><th scope="col">Description</th><th scope="col">Speaker</th>'+
-                '</tr></thead>';
+    htmlString += '<table class="table table-striped schedule-table">'+
+                  '<thead class="thead-dark"><tr>'+
+                      '<th class="th-s" scope="col">Start Time</th>'+
+                      '<th class="th-s" scope="col">End Time</th>'+
+                      '<th class="th-s" scope="col">Session Type</th>'+
+                      '<th class="th-l" scope="col">Description</th>'+
+                      '<th class="th-m" scope="col">Speaker</th>'+
+                  '</tr></thead>';
     
     // Create Rows (Need to add logic)
     htmlString += '<tbody>';
