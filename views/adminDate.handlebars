@@ -31,6 +31,7 @@
   <a type="button" class="btn btn-primary" href="/admin/room/{{roomName}}">Back</a>
   <a type="button" class="btn btn-primary" href="/createFullscreen/{{roomName}}/{{fileName}}"> Create Full Screen Slide</a>
   <a type="button" class="btn btn-primary" href="/createSchedule/{{roomName}}/{{fileName}}"> Create Schedule Slide</a>
+  
   {{!--<a type="button" class="btn btn-primary" href="/createVideo/{{roomName}}/{{fileName}}"> Create Video Slide</a>--}}
   
   <a type="button" class="btn btn-primary" href="/room/{{roomName}}/{{fileName}}">Preview</a>
@@ -70,22 +71,30 @@
       }
       
       
-      const slides = fileContent.slides;
+      let slides = fileContent.slides;
+      
+      slides = sortByKey(slides, "order");
       
       slides.forEach(function(slide) {
         let row = $('<tr></tr>');
         let header = $('<th scope="col" style="text-align: right"></th>');
-        let divcol1 = $('<div class="th-edit">'+slide.slideName+'</div>');
+        let divcol1 = $('<div class="th-edit">'+slide.slideName+'   ['+slide.type+']</div>');
         let divcol2 = $('<div class="th-edit" style="text-align: left"></div>');
         
-        let button = $('<button type="button" class="btn btn-warning" id="'+slide.slideName+'">Delete</button>');
+        let deleteButton = $('<button type="button" class="btn btn-warning" id="'+slide.slideName+'">Delete</button>');
         
+        // write a function which returns html string
+        // function check slide.type, return correct html
+        let type = slide.type; // TYPE IS NOT CAPITAL
+        let editButton = $('<a type="button" class="btn btn-primary" href="/admin/room/edit'+type+'/'+roomName+'/'+fileName+'/'+slide.slideName+'">Edit</a>');
+
         let id = slide.slideName;
-        button.click( function() {
+        deleteButton.click( function() {
           deleteSlide(id);
         });
         
-        divcol2.append(button);
+        divcol2.append(deleteButton);
+        divcol2.append(editButton);
         header.append(divcol1);
         header.append(divcol2);
         row.append(header);
@@ -94,6 +103,14 @@
         
         $('#slides').append(row);
       });
+      
+      function sortByKey(array, key) {
+          return array.sort(function(a, b) {
+              var x = parseInt(a[key]); var y = parseInt(b[key]);
+              return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+          });
+      }
+      
     });
   </script>
 </body>

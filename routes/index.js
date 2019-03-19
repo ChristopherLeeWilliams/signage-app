@@ -91,10 +91,67 @@ router.get('/admin/room/:name/:file', function(req, res, next) {
     });
 });
 
+router.get('/admin/room/editSchedule/:name/:file/:slideName', function(req, res, next) {
+    // Read all contents of path
+    const roomName = req.params.name;
+    const fileName = req.params.file;
+    const slideName = req.params.slideName;
+    const fullPath = roomsPath+"/"+roomName+"/"+fileName;
+    
+    console.log("Full Path: " + fullPath);
+    fs.access(fullPath, fs.F_OK, err => {
+        if(err) { res.send("Todays schedule has not been made"); return; } // file does not exist
+        
+        fs.readFile(fullPath, 'utf8', function read(err, data) {
+            if (err) { res.send("Error reading file"); console.log(err); return; }
+            
+            data = JSON.parse(data);
+            
+            data = JSON.stringify(data);
+            
+            
+            // Data has json file content, does it contain list of needed images to send links for?
+            res.render('editSchedule', { fileContent: data, roomName: roomName, fileName: fileName, slideName: slideName, layout: false } );
+        });
+    });
+});
+
+router.get('/admin/room/editFullscreen/:name/:file/:slideName', function(req, res, next) {
+    // Read all contents of path
+    const roomName = req.params.name;
+    const fileName = req.params.file;
+    const slideName = req.params.slideName;
+    const fullPath = roomsPath+"/"+roomName+"/"+fileName;
+    
+    console.log("Full Path: " + fullPath);
+    fs.access(fullPath, fs.F_OK, err => {
+        if(err) { res.send("Todays schedule has not been made"); return; } // file does not exist
+        
+        fs.readFile(fullPath, 'utf8', function read(err, data) {
+            if (err) { res.send("Error reading file"); console.log(err); return; }
+            
+            data = JSON.parse(data);
+            
+            data = JSON.stringify(data);
+            
+            
+            // Data has json file content, does it contain list of needed images to send links for?
+            res.render('editFullscreen', { fileContent: data, roomName: roomName, fileName: fileName, slideName: slideName, layout: false } );
+        });
+    });
+});
+
 router.get('/room/:name', function(req, res, next) {
     // whenever a file request is made, check that tracker is up to date
+    try {
     checkFileTrackerUpToDate();
+    } catch (e) {
+        console.log(e);
+        res.send(e);
+    }
     const roomName = req.params.name;
+    
+    console.log("Trying to serve from: " + roomName);
     const daySchedule = roomNameToDaySchedule(roomName);
     
     const fullPath = roomsPath + roomName + "/" + daySchedule; 
@@ -161,7 +218,8 @@ router.get('/room/:name/:fileName', function(req, res, next) {
 router.post('/isValid', function(req, res, next) {
     try {
         // Check that tracker is up to date
-        if (!checkFileTrackerUpToDate()) { }
+        if (!checkFileTrackerUpToDate()) { res.send(false); return;}
+        
         const data = req.body;
         console.log("Data sent: %o", data);
         const fileName = roomNameToDaySchedule(data["roomname"]);
@@ -173,7 +231,7 @@ router.post('/isValid', function(req, res, next) {
         console.log("Comparing valid: %o", validData);
         console.log("With: %o", data);
         
-        if(!validData) {res.send(false);}
+        if(!validData) {res.send(false); return;}
         let valid = (data["lastModified"] === validData["lastModified"]);
         valid &= (data["fileDate"] === validData["fileDate"]);
         
@@ -188,19 +246,22 @@ router.post('/isValid', function(req, res, next) {
 });
 
 /* 
-    Get a sample of the file tracker
-    If the date of that sample was from a different day,
+    Checks the file tracker for updates
+    If the date (NOT TIME) of any entry was from a different day than current,
     Repopulate the file tracker to show only today's files 
 */ 
 function checkFileTrackerUpToDate() {
-    let sample = Object.keys(roomsFileTracker)[0];
-    sample = roomsFileTracker[sample].date;
-    
     let currentDate = getDate();
-    if(currentDate !== sample) {
-        populateRoomsFileTracker();
-        return false;
-    }
+    let keys = Object.keys(roomsFileTracker);
+    
+    keys.forEach(function(key) {
+        console.log("Key: " + key);
+        let sample = roomsFileTracker[key].date;
+        if((typeof(date) !== 'undefined') && (currentDate !== sample)) {
+            populateRoomsFileTracker();
+            return false;
+        }
+    });
     return true;
 }
 
@@ -219,25 +280,23 @@ function getDate() {
 function populateRoomsFileTracker() {
     // Read all contents of path
     fs.readdir(roomsPath, function(err, items) {
-        if(err) {  } 
+        if(err) {  console.log("Error while reading rooms directory: " + err); } 
         else {
             // filter for folders only
             const filtered = items.filter(item => (fs.lstatSync(roomsPath+item)).isDirectory() );
-            
-            // Empty the file tracker
             roomsFileTracker = {};
-    
+            
             filtered.forEach(function(room) {
-                
                 // Update the file tracker for each room
                 let daySchedule = roomNameToDaySchedule(room);
                 let fullPath = roomsPath + room + "/" + daySchedule;
                 fs.readFile(fullPath, 'utf8', function read(err, data) {
-                    if (err) { }// Does not exist 
+                    if (err) { console.log("[PopulateRoomsFileTracker] : Todays schedule has not been made for \"" + room + "\", should be file: \"" + daySchedule+ "\""); }// Does not exist 
                     else {
                         data = JSON.parse(data);
-                        // check stuff here
-                        updateRoomsFileTracker(daySchedule, data["lastModified"], data["date"]);
+                        if((typeof(data["lastModified"]) !== "undefined") && (typeof(data["date"]) !== "undefined")) {
+                            updateRoomsFileTracker(daySchedule, data["lastModified"], data["date"]);
+                        }
                     }
                 });
             });
@@ -317,7 +376,6 @@ router.post('/createDate', function(req, res, next) {
     else { res.send("Date Created"); }
   });
 });
-
 router.post('/deleteSlide', function(req, res, next) {
     try {
         // rooms path
@@ -373,9 +431,6 @@ router.post('/deleteSlide', function(req, res, next) {
         res.send("fail");
     }
 });
-
-
-
 router.post('/uploadFullscreen', function(req, res, next) {
     try {
     let slideList = {};
@@ -549,6 +604,117 @@ router.post('/uploadSchedule', function(req, res, next) {
         res.send("Error: " + e);
     }
 });
+
+//for uploading a new slide schedule
+router.post('/updateSchedule', function(req, res, next) {
+    try {
+        let slideName = req.body.slideNameOld;
+        let bgcolor = req.body.bgcolor;
+        let orderNum = req.body.ordernum;
+        let orientation = req.body.orientation;
+        let oldLogoCheck = req.body.oldLogoCheck;
+        
+        // Get full path to json file
+        let roomDate = req.body.fileName;
+        let roomName = req.body.roomName;
+        let fullPath = roomsPath + roomName + "/" + roomDate;
+        
+        // Create array to hold rows
+        let rowList = [];
+        
+        // Only iterate through table if multiple rows
+        if (Array.isArray(req.body.startTime)) {
+            for (let i = 0; i < req.body.startTime.length; i++) {
+                // An array holding the information of the slides
+                rowList.push({
+                    startTime: req.body.startTime[i],
+                    endTime: req.body.endTime[i],
+                    sessionType: req.body.sessionType[i],
+                    description: req.body["description"][i], // description is a keyword
+                    speaker: req.body.speaker[i]
+                });
+            }
+        } else {
+            rowList.push({
+                startTime: req.body.startTime,
+                endTime: req.body.endTime,
+                sessionType: req.body.sessionType,
+                description: req.body["description"],
+                speaker: req.body.speaker
+            });
+        }
+        
+        let slideList = {
+            "type": "schedule",
+            "order": orderNum,
+            "slideName": req.body.slidename, // update with possibly new slide name
+            "orientation": orientation,
+            "content": {
+                "bgcolor" : bgcolor,
+                "table": rowList
+            }
+        };
+
+        if(oldLogoCheck) {
+            fs.access(fullPath, fs.F_OK, err => {
+                if(err) { res.send("File does not exist"); return; } // file does not exist
+                fs.readFile(fullPath, 'utf8', function read(err, data) {
+                    if (err) { res.send("Error"); console.log(err); return; }
+                    data = JSON.parse(data);
+                    for(let i = 0; i < data.slides.length ; i++){
+                        let temp = data.slides[i];
+                        if(temp.slideName === slideName){
+                            slideList.content.logo = temp.content.logo;
+                            data.slides[i] = slideList; 
+                        }
+                    }
+                    data["lastModified"] = new Date();
+                    data = JSON.stringify(data);
+                    fs.writeFile(fullPath, data, function (err) {
+                        if (err) { res.send("Failed"); } 
+                        else { res.send("Schedule Uploaded!"); }
+                    });
+                });
+            });
+            return;   
+        }
+        
+        // New Image is being used
+        let imgFileName = req.body.imageName;
+        let logoFile = req.files.logo;
+        let imgFilePath = path.join(__dirname,"../public/images/",imgFileName);
+        
+        // Transfer file to location. Use the mv() method to place the file somewhere on your server
+        logoFile.mv(imgFilePath, function (err) {
+            if (err) { res.send("Error:"+err ); }
+            else { 
+                fs.access(fullPath, fs.F_OK, err => {
+                    if(err) { res.send("File does not exist"); return; } // file does not exist
+                    fs.readFile(fullPath, 'utf8', function read(err, data) {
+                        if (err) { res.send("Error"); console.log(err); return; }
+                        data = JSON.parse(data);
+                        for(let i = 0; i < data.slides.length ; i++){
+                            if(data.slides[i].slideName === slideName){
+                                slideList.content.logo = imgFilePath;
+                                data.slides[i] = slideList; 
+                            }
+                        }
+                        data["lastModified"] = new Date();
+                        data = JSON.stringify(data);
+                        fs.writeFile(fullPath, data, function (err) {
+                            if (err) { res.send("Failed"); } 
+                            else { res.send("Schedule Uploaded!"); }
+                        });
+                    });
+                });
+            }
+        });
+    } catch (e) {
+        console.log(e);
+        res.send("Error: " + e);
+    }
+});
+
 
 router.get('/createFullscreen/:roomName/:fileName', function(req, res, next) { 
     const roomName = req.params.roomName;

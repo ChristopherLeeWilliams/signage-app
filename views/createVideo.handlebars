@@ -121,8 +121,8 @@ let date = "";
                 <div class="col-centered">
                     <label for="videoLink" class="col-auto col-form-label form-check-inline"> Play Full </label>
                     <div class="form-check col-auto form-check-inline">
-                        <input class="form-check-input big-checkbox" type="checkbox" value="" id="defaultCheck1">
-                        <label class="form-check-label col-auto" for="defaultCheck1">
+                        <input class="form-check-input big-checkbox" type="checkbox" value="" id="playFull" name="playFull">
+                        <label class="form-check-label col-auto" for="playFull">
                             Check to play entire video
                         </label>
                     </div>
@@ -139,7 +139,7 @@ let date = "";
             <div class="form-group row ">
                 <div class="col-centered">
                     <div class="col-auto form-check-inline">
-                        <input class="form-control form-check-inline" id="duration" type="NUMBER" name="duration" size="1">
+                        <input class="form-control form-check-inline" id="duration" type="NUMBER" name="duration" size="1" min=0 required>
                     </div>
                     <div class="col-auto form-check-inline">
                         <label for="duration" class="col-sm-2 col-form-label "> Seconds </label>
@@ -157,7 +157,7 @@ let date = "";
         $(document).ready(function () {
             // Set default color to something with 120 lum
             document.getElementById("bgcolor").value = "#3C53C4";
-
+            
 
             // Submit button action
             $("form#videoForm").submit(function (event) {
@@ -165,6 +165,13 @@ let date = "";
                 let form = $("#videoForm")[0];
                 let formData = new FormData(form);
                 let orientation = $("#orientation").val();
+                let playFull = document.getElementById("playFull").checked;
+                
+                if (playFull){
+                    formData.append('duration' , '-1')
+                }else{
+                    formData.append('duration' , playFull)
+                }
                 formData.append('orientation', orientation);
 
                 $.ajax({
@@ -189,7 +196,17 @@ let date = "";
                 });
             });
 
-            $("#")
+            $("#playFull").change(function () {
+                playFull = this.checked;
+                if (playFull) {
+                    $("#duration").prop("disabled", true);
+    
+                } else {
+                    $("#duration").prop("disabled", false);
+    
+                }
+
+            });
 
         });
     </script>

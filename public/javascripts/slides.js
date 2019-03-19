@@ -9,7 +9,17 @@ function createSlideShow(room, serverTime) {
         temp.content = createSlide(slide);
         slideshow.push(temp);
     });
+    
+    slideshow = sortByKey(slideshow, "order");
+    
     return slideshow;
+}
+
+function sortByKey(array, key) {
+    return array.sort(function(a, b) {
+        var x = parseInt(a[key]); var y = parseInt(b[key]);
+        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    });
 }
 
 /*

@@ -1,28 +1,28 @@
 {
   "roomName": "example room",
   "update": true,
-  "date": "3.18.2019",
+  "date": "3.19.2019",
   "lastModified": "2019-03-18T22:00:01.840Z",
   "slides": [
     {
       "type": "fullscreen",
-      "order": "1",
-      "slideName": "Slide 1 Sponsors",
+      "order": "2",
+      "slideName": "Sponsors",
       "content": {
         "img": "/home/ubuntu/workspace/signageApp/public/images/slide1.jpg"
       }
     },
     {
       "type": "fullscreen",
-      "order": "2",
-      "slideName": "Slide 2 Ad",
+      "order": "3",
+      "slideName": "Ad",
       "content": {
         "img": "/home/ubuntu/workspace/signageApp/public/images/slide2.jpg"
       }
     },
     {
       "type": "schedule",
-      "order": "4",
+      "order": "1",
       "slideName": "The Pacific Promenade 1-3",
       "orientation": "vertical",
       "content": {

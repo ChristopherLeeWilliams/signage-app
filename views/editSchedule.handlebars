@@ -22,7 +22,7 @@
 <body>
 
   <div class="row justify-content-center align-items-center">
-    <h1 class="display-3">Create Schedule Slide</h1>
+    <h1 class="display-3">Edit "{{slideName}}"</h1>
   </div>
 
   <form id="slideForm">
@@ -62,10 +62,19 @@
           <input class="form-control" id="bgcolor" type="COLOR" name="bgcolor" required>
         </div>
       </div>
+      
+      <div class="form-group row">
+      <div class="col-sm-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="oldLogoCheck" name="oldLogoCheck" checked>
+          <label class="form-check-label" for="oldLogoCheck"> Use Old Logo </label>
+        </div>
+      </div>
+      </div>
 
       <div class="form-group row">
-        <div class="custom-file">
-          <input type="file" class="custom-file-input" id="logo" type="file" name="logo">
+        <div class="custom-file" id="fileInputDiv">
+          <input type="file" class="custom-file-input" id="logo" type="file" name="logo" disabled>
           <label class="custom-file-label" for="logo">Choose file...</label>
         </div>
       </div>
@@ -135,23 +144,71 @@
 
   <script>
     $(document).ready(function () {
-      // Set default color
-      document.getElementById("bgcolor").value = "#ffffff";
       
-      let roomName = "{{room}}";
-      let fileName = "{{file}}";
+      const fileContent = {{{fileContent}}};
+      const slideName = "{{{slideName}}}";
+      const slides = fileContent.slides;
+      const slideIndex = getSlide(slides, slideName);
+      const currentSlide = slides[slideIndex];
+      const rows = currentSlide.content.table;
+
+      console.log(slides);
+      console.log(slideIndex);
+
+
+      // Populate form
+      document.getElementById("slidename").value = currentSlide.slideName;
+      document.getElementById("ordernum").value = currentSlide.order;
+      document.getElementById("orientation").value = currentSlide.orientation;
+      document.getElementById("bgcolor").value = currentSlide.content.bgcolor;
+
+      $("#myTable").find('tbody').empty();
+      rows.forEach(function(e){
+        // Clear table
+  
+
+        $("#myTable").find('tbody').append(
+            "<tr>            <td><input class='form-control' type='TIME' name='startTime' size='8' value='"+ e.startTime +"' required><br></td>            <td><input class='form-control' type='TIME' name='endTime' size='8' value='"+ e.endTime +"' required><br></td>            <td>              <div class='input-group mb-3'>                <div class='input-group-prepend'>                  <label class='input-group-text' for='inputGroupSelect01'>Options</label>                </div>                <select class='custom-select' name='sessionType' value='"+ e.sessionType +"'>                  <option>Open Session</option>                  <option>Private Meeting</option>                  <option>No Session</option>                  <option>End of Day</option>                </select>              </div>            </td>            <td>              <div class='input-group'>                <textarea class='form-control' name='description' rows='4' columns='25' >"+ e.description +"</textarea>              </div>            </td>            <td>              <div class='inpu-group'>                <input class='form-control' type='TEXT' name='speaker' size='20' value='"+ e.speaker +"'>              </div>            </td>          </tr>"
+        );
+      });
       
-      // Setting number of rows
-      $("#addRow").click(function () {
+      
+      function addRows (numRows) {
         // Clear table
         $("#myTable").find('tbody').empty();
 
         let totalRows = $("#numRows").val();
-        for (let i = 0; i < totalRows; i++) {
+        for (let i = 0; i < numRows; i++) {
           $("#myTable").find('tbody').append(
             "<tr>            <td><input class='form-control' type='TIME' name='startTime' size='8' required><br></td>            <td><input class='form-control' type='TIME' name='endTime' size='8' required><br></td>            <td>              <div class='input-group mb-3'>                <div class='input-group-prepend'>                  <label class='input-group-text' for='inputGroupSelect01'>Options</label>                </div>                <select class='custom-select' name='sessionType'>                  <option>Open Session</option>                  <option>Private Meeting</option>                  <option>No Session</option>                  <option>End of Day</option>                </select>              </div>            </td>            <td>              <div class='input-group'>                <textarea class='form-control' name='description' rows='4' columns='25'></textarea>              </div>            </td>            <td>              <div class='inpu-group'>                <input class='form-control' type='TEXT' name='speaker' size='20'>              </div>            </td>          </tr>"
           );
         }
+      }
+      
+      function getSlide (data, name){
+        // Find index of current slide
+        for(let i = 0; i < data.length ; i++){
+          if(data[i].slideName == name){
+            return i;
+          }
+        }
+        // CREATE CASE FOR NOT FINDING IT?
+      }
+
+
+      // Set default color
+      document.getElementById("bgcolor").value = "#ffffff";
+      
+      let roomName = "{{roomName}}";
+      let fileName = "{{fileName}}";
+      
+      console.log(roomName+"/"+fileName+"/"+slideName);
+      
+      // Setting number of rows
+      $("#addRow").click(function(){
+        let totalRows = $("#numRows").val();
+        addRows(totalRows);
+        
       });
 
       // Submit button action
@@ -160,18 +217,23 @@
         
         let form = $("#slideForm")[0];
         let formData = new FormData(form);
-        let imageFile = document.getElementById("logo");
-        let image = imageFile.files[0];
         let orientation = $("#orientation").val();
-        formData.append('image', image);
-        formData.append('imageName', image.name);
+
         formData.append('orientation', orientation);
         formData.append('roomName', roomName);
         formData.append('fileName', fileName);
-
-
+        formData.append('slideNameOld', slideName);
+        
+        if($('#oldLogoCheck').prop('checked') == false) {
+          let imageFile = document.getElementById("logo");
+          let image = imageFile.files[0];
+          formData.append('image', image);
+          formData.append('imageName', image.name);
+        } else {
+          formData.delete('logo'); // dont try to upload the logo input data (nothing anyways)
+        }
         $.ajax({
-          url: "/uploadSchedule",
+          url: "/updateSchedule",
           type: "POST",
           enctype: "multipart/form-data",
           processData: false,
@@ -197,6 +259,16 @@
       $(".custom-file-input").on("change", function () {
         var fileName = $(this).val().split("\\").pop();
         $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+      });
+
+      $('#oldLogoCheck').change (function() {
+        if($(this).is(':checked')) {
+          console.log("Checked");
+          $('#logo').attr('disabled','disabled');
+        } else {
+          console.log("Unchecked");
+          $('#logo').removeAttr('disabled');
+        }
       });
 
     });
